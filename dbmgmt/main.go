@@ -14,7 +14,7 @@ func main() {
 }
 
 func GetDBInstance() (*gorm.DB, error) {
-	return gorm.Open(mysql.Open("myuser:mypassword@tcp(127.0.0.1:3307)/twiffer"))
+	return gorm.Open(mysql.Open("myuser:mypassword@tcp(127.0.0.1:3307)/twiffer?parseTime=true"))
 }
 
 func InitDB() {
