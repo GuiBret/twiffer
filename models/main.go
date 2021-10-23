@@ -10,6 +10,7 @@ type User struct {
 	gorm.Model
 	Tagname      string
 	Profile_name string
+	Tweets       []Tweet `gorm:"foreignKey:From"`
 }
 
 type UserGet struct {
@@ -24,6 +25,10 @@ type Tweet struct {
 	FromID    int
 	Content   string
 	Timestamp time.Time
+}
+
+type TweetPost struct {
+	Message string `json:"message"`
 }
 
 type Mention struct {
