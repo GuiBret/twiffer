@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"twitter-ripoff/tweets"
 	"twitter-ripoff/users"
 
 	"github.com/gorilla/mux"
@@ -13,6 +14,7 @@ func main() {
 	r.Use(jsonMiddleware)
 
 	// dbmgmt.InitDB()
+	r.HandleFunc("/users/{id:[0-9]+}/tweet", tweets.WriteTweet).Methods("POST")
 	r.HandleFunc("/users/{id:[0-9]+}", users.GetOneUser).Methods("GET")
 	r.HandleFunc("/users", users.CreateUser).Methods("POST")
 
