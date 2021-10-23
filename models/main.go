@@ -21,13 +21,16 @@ type UserGet struct {
 
 type Tweet struct {
 	gorm.Model
-	From      User
-	FromID    int
-	Content   string
-	Timestamp time.Time
+	From    User
+	FromID  int
+	Content string
 }
 
 type TweetPost struct {
+	Message string `json:"message"`
+}
+
+type TweetGet struct {
 	Message string `json:"message"`
 }
 
