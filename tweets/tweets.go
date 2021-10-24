@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"twitter-ripoff/dbmgmt"
+	"twitter-ripoff/errhandling"
 	"twitter-ripoff/models"
 
 	"github.com/gorilla/mux"
@@ -38,8 +39,7 @@ func GetTweet(w http.ResponseWriter, r *http.Request) {
 	err = db.First(&tweet, id_tweet).Error
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Tweet not found")
+		errhandling.HandleError(w, "Tweet not found", http.StatusNotFound, 0)
 		return
 	}
 
@@ -73,16 +73,14 @@ func WriteTweet(w http.ResponseWriter, r *http.Request) {
 	err = db.First(&user, user_id).Error
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "User not found")
+		errhandling.HandleError(w, "User not found", http.StatusNotFound, 0)
 		return
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&payload)
 
 	if err != nil || payload.Message == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Invalid payload")
+		errhandling.HandleError(w, "Invalid payload", http.StatusBadRequest, 0)
 		return
 	}
 
@@ -110,28 +108,27 @@ func DeleteTweet(w http.ResponseWriter, r *http.Request) {
 	id_tweet, err := strconv.Atoi(mux.Vars(r)["idtweet"])
 
 	if err != nil {
-		fmt.Print("Invalid number")
+		errhandling.HandleError(w, "Invalid number", http.StatusBadRequest, 0)
 		return
 	}
 
 	db, err := dbmgmt.GetDBInstance()
 
 	if err != nil {
-		fmt.Print("DB error")
+		errhandling.HandleError(w, "DB error", http.StatusInternalServerError, 0)
 		return
 	}
 
 	err = db.First(&tweet, id_tweet).Error
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Tweet not found")
+		errhandling.HandleError(w, "Tweet not found", http.StatusNotFound, 0)
 		return
 	}
 
 	if id_user != tweet.FromID {
-		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprint(w, "User does not own this tweet")
+		errhandling.HandleError(w, "User does not own this tweet", http.StatusForbidden, 0)
+		return
 
 	}
 

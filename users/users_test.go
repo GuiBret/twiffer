@@ -3,6 +3,8 @@ package users
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -63,12 +65,9 @@ func TestShouldReturn201SincePayloadValid(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, mock_response_writer.Result().StatusCode, "Status code should be 201")
 
-	buffer := new(bytes.Buffer)
-	buffer.ReadFrom(mock_response_writer.Result().Body)
-	user_response := buffer.Bytes()
-
 	var user_obj models.UserGet
-	json.Unmarshal(user_response, &user_obj)
+
+	ParseResponse(mock_response_writer.Result().Body, &user_obj)
 
 	assert.Equal(t, "abc", user_obj.Tagname, "Tagname should equal abc")
 	assert.Equal(t, "def", user_obj.Profile_name, "Profile name should equal def")
@@ -115,15 +114,28 @@ func TestShouldReturnUserSinceExists(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode, "Status code should be 200")
 
-	buffer := new(bytes.Buffer)
-	buffer.ReadFrom(w.Result().Body)
-	user_response := buffer.Bytes()
-
 	var user_obj models.UserGet
-	json.Unmarshal(user_response, &user_obj)
+
+	ParseResponse(w.Result().Body, &user_obj)
 
 	assert.Equal(t, uint(1), user_obj.ID, "The users ID should be 1")
 	assert.Equal(t, "Machin", user_obj.Tagname, "The users Tagname should be machin")
 	assert.Equal(t, "bidule", user_obj.Profile_name, "The users Profile name should be bidule")
+
+}
+
+// TODO: mutualiser ces fonctions
+func ParseResponse(payload io.ReadCloser, obj interface{}) {
+	buffer := new(bytes.Buffer)
+	buffer.ReadFrom(payload)
+	user_response := buffer.Bytes()
+
+	err := json.Unmarshal(user_response, obj)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	fmt.Print(obj)
 
 }
