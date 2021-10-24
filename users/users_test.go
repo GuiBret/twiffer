@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"twitter-ripoff/errhandling"
 	"twitter-ripoff/models"
 
 	"github.com/gorilla/mux"
@@ -36,10 +37,11 @@ func TestShouldReturn400SincePayloadInvalid(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, mock_response_writer.Result().StatusCode, "Status code should be 400")
 
-	buffer := new(bytes.Buffer)
-	buffer.ReadFrom(mock_response_writer.Result().Body)
+	err_response := errhandling.ParseError(mock_response_writer.Result().Body)
 
-	assert.Equal(t, "Error", buffer.String())
+	assert.Equal(t, "Invalid payload", err_response.Message)
+	assert.Equal(t, 0, err_response.Code)
+	assert.Equal(t, http.StatusBadRequest, mock_response_writer.Result().StatusCode)
 
 }
 
@@ -88,7 +90,11 @@ func TestShouldReturn404SinceUserDoesNotExist(t *testing.T) {
 
 	GetOneUser(w, r)
 
+	err_response := errhandling.ParseError(w.Result().Body)
+
 	assert.Equal(t, http.StatusNotFound, w.Result().StatusCode, "Status code should be 404")
+	assert.Equal(t, "User not found", err_response.Message, "Status code should be 404")
+	assert.Equal(t, 0, err_response.Code, "Status code should be 404")
 
 }
 

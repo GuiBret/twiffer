@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"twitter-ripoff/dbmgmt"
+	"twitter-ripoff/errhandling"
 	"twitter-ripoff/models"
 
 	"github.com/gorilla/mux"
@@ -33,7 +34,9 @@ func GetOneUser(w http.ResponseWriter, r *http.Request) {
 	err = db.Select([]string{"ID", "Tagname", "Profile_name"}).First(user, user_id).Error
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+
+		errhandling.HandleError(w, "User not found", http.StatusNotFound, 0)
+
 		return
 	}
 
@@ -60,8 +63,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil || u.Profile_name == "" || u.Tagname == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error")
+		errhandling.HandleError(w, "Invalid payload", http.StatusBadRequest, 0)
 		return
 	}
 
