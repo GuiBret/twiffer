@@ -47,6 +47,8 @@ func GetOneUser(w http.ResponseWriter, r *http.Request) {
 	res, err := json.Marshal(&user_parsed)
 	if err != nil {
 		fmt.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprint(w, string(res))
