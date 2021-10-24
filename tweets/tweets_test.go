@@ -16,6 +16,52 @@ type InvalidTweetPost struct {
 	Msg string `json:"msg"`
 }
 
+func TestGetTweetShouldReturn404SinceTweetDoesNotExist(t *testing.T) {
+	w := httptest.NewRecorder()
+	r, err := http.NewRequest(http.MethodGet, "http://localhost:4000/users/100000/tweet/2", nil)
+
+	if err != nil {
+		t.Fatal("Error")
+	}
+
+	vars := map[string]string{
+		"id":      "1",
+		"idtweet": "2000000",
+	}
+	r = mux.SetURLVars(r, vars)
+
+	GetTweet(w, r)
+
+	buffer := new(bytes.Buffer)
+	buffer.ReadFrom(w.Result().Body)
+
+	assert.Equal(t, "Tweet not found", buffer.String())
+	assert.Equal(t, http.StatusNotFound, w.Result().StatusCode, "Should return 404")
+}
+
+// TODO: handle payload
+func TestGetTweetShouldReturn200SinceTweetExists(t *testing.T) {
+	w := httptest.NewRecorder()
+	r, err := http.NewRequest(http.MethodGet, "http://localhost:4000/users/100000/tweet/2", nil)
+
+	if err != nil {
+		t.Fatal("Error")
+	}
+
+	vars := map[string]string{
+		"id":      "1",
+		"idtweet": "5",
+	}
+	r = mux.SetURLVars(r, vars)
+
+	GetTweet(w, r)
+
+	buffer := new(bytes.Buffer)
+	buffer.ReadFrom(w.Result().Body)
+
+	assert.Equal(t, http.StatusOK, w.Result().StatusCode, "Should return 200")
+}
+
 func TestShouldReturn404SinceUserDoesNotExist(t *testing.T) {
 	w := httptest.NewRecorder()
 

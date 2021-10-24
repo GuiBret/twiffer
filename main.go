@@ -15,6 +15,7 @@ func main() {
 
 	// dbmgmt.InitDB()
 	r.HandleFunc("/users/{id:[0-9]+}/tweet/{idtweet:[0-9]+}", tweets.DeleteTweet).Methods("DELETE")
+	r.HandleFunc("/users/{id:[0-9]+}/tweet/{idtweet:[0-9]+}", tweets.GetTweet).Methods("GET")
 	r.HandleFunc("/users/{id:[0-9]+}/tweet", tweets.WriteTweet).Methods("POST")
 	r.HandleFunc("/users/{id:[0-9]+}", users.GetOneUser).Methods("GET")
 	r.HandleFunc("/users", users.CreateUser).Methods("POST")

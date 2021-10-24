@@ -16,6 +16,44 @@ func main() {
 }
 
 func GetTweet(w http.ResponseWriter, r *http.Request) {
+
+	var tweet models.Tweet
+
+	db, err := dbmgmt.GetDBInstance()
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Print("DB error")
+		return
+	}
+
+	id_tweet, err := strconv.Atoi(mux.Vars(r)["idtweet"])
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Print("Invalid tweet ID")
+		return
+	}
+
+	err = db.First(&tweet, id_tweet).Error
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Tweet not found")
+		return
+	}
+
+	res, err := json.Marshal(&tweet)
+
+	if err != nil {
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "Cant parse tweet")
+		return
+	}
+
+	fmt.Fprint(w, string(res))
+
 }
 
 func WriteTweet(w http.ResponseWriter, r *http.Request) {
