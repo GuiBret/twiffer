@@ -16,7 +16,6 @@ func main() {
 }
 
 func GetTweet(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func WriteTweet(w http.ResponseWriter, r *http.Request) {
@@ -63,4 +62,39 @@ func WriteTweet(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprint(w, string(res))
+}
+
+// TODO: finish this endpoint
+func DeleteTweet(w http.ResponseWriter, r *http.Request) {
+
+	var tweet models.Tweet
+	id_user, err := strconv.Atoi(mux.Vars(r)["id"])
+	id_tweet, err := strconv.Atoi(mux.Vars(r)["idtweet"])
+
+	if err != nil {
+		fmt.Print("Invalid number")
+		return
+	}
+
+	db, err := dbmgmt.GetDBInstance()
+
+	if err != nil {
+		fmt.Print("DB error")
+		return
+	}
+
+	err = db.First(&tweet, id_tweet).Error
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Tweet not found")
+		return
+	}
+
+	if id_user != tweet.FromID {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprint(w, "User does not own this tweet")
+
+	}
+
 }
