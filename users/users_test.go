@@ -20,7 +20,6 @@ type InvalidUserPost struct {
 	Profile_name string `json:"profile_name"`
 }
 
-// TODO: error handling
 func TestShouldReturn400SincePayloadInvalid(t *testing.T) {
 
 	mock_response_writer := httptest.NewRecorder()
